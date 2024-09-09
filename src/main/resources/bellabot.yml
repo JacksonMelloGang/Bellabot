@@ -1,0 +1,5 @@
+# Owner of a guild = OwnerID ?
+owner_guild_pass: true
+
+# Display error made while executing command in log channel ?
+error_display_log: true

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+// config.yml
 public class ConfigManager {
     private static final String CONFIG_FILE = "config.yml";
     private static Map<String, Object> config;
@@ -21,6 +22,9 @@ public class ConfigManager {
         Yaml yaml = new Yaml();
         try (FileInputStream fis = new FileInputStream(file)) {
             config = yaml.load(fis);
+//            for(Map.Entry<String, Object> entry : config.entrySet() ){
+//                System.out.println(String.format("%s - %s", entry.getKey(), entry.getValue()));
+//            }
         }
     }
 
@@ -45,6 +49,10 @@ public class ConfigManager {
         return (String) config.get("token");
     }
 
+    public static String getOwnerID(){
+        return config.get("ownerID") == null ? (String) config.get("ownerID") : null;
+    }
+
     public static String getMySQLHost() {
         return (String) config.get("mysql.host");
     }
@@ -65,7 +73,5 @@ public class ConfigManager {
         return (String) config.get("mysql.password");
     }
 
-    public static String getOwnerID(){
-        return (String) config.get("ownerID");
-    }
+
 }
