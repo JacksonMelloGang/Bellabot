@@ -25,19 +25,12 @@ public class BellaBot {
 
     public static void main(String[] args) throws Exception {
         CronScheduler cronScheduler = new CronScheduler();
-
+        databaseManager = DatabaseManager.getInstance();
 
         // Charger la configuration
         Logger.info("Step 1/5 - Loading Config & stuffs ");
         ConfigManager.loadConfig();
         BellaConfig.loadConfig();
-
-        // Connexion à la base de données
-        databaseManager = DatabaseManager.getInstance();
-
-        databaseManager.registerEntity(GuildEntity.class);
-        databaseManager.registerEntity(UserEntity.class);
-        databaseManager.registerEntity(CommandEntity.class);
 
         // Initialiser le gestionnaire de commandes avec le système de permissions par défaut
         Logger.info("Step 2/5 - Initializing commands");
@@ -50,6 +43,11 @@ public class BellaBot {
         Logger.info("Step 3/5 - Loading plugins");
         pluginManager = new PluginManager();
         pluginManager.loadPlugins();
+
+
+        databaseManager.registerEntity(GuildEntity.class);
+        databaseManager.registerEntity(UserEntity.class);
+        databaseManager.registerEntity(CommandEntity.class);
 
         Logger.info("Step 4/5 - Connecting to the database");
         databaseManager.connect();

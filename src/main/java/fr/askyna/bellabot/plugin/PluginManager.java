@@ -14,7 +14,6 @@ import java.util.jar.JarFile;
 
 public class PluginManager {
     private final List<Plugin> plugins = new ArrayList<>();
-    private PluginLoader pluginLoader = PluginLoader.getInstance();
     private static PluginManager INSTANCE;
 
     public void loadPlugins() {
@@ -27,7 +26,7 @@ public class PluginManager {
         if (files != null) {
             for (File file : files) {
                 try {
-                    Plugin plugin = pluginLoader.loadPlugin(file);
+                    Plugin plugin = PluginLoader.loadPlugin(file);
                     plugin.onEnable();
                     plugins.add(plugin);
 
@@ -80,11 +79,6 @@ public class PluginManager {
     public List<Plugin> getPlugins() {
         return plugins;
     }
-
-    public PluginLoader getPluginLoader() {
-        return pluginLoader;
-    }
-
 
     public static PluginManager getInstance() {
         if(INSTANCE == null){

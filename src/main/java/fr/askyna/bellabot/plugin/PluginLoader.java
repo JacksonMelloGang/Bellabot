@@ -18,11 +18,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 public class PluginLoader {
-    private static PluginLoader instance;
-
-
-
-    public Plugin loadPlugin(File file) throws Exception {
+    public static Plugin loadPlugin(File file) throws Exception {
         // Read .jar file and get plugin.yml file
         JarFile jarFile = new JarFile(file);
         InputStream inputStream = jarFile.getInputStream(jarFile.getEntry("plugin.yml"));
@@ -49,7 +45,7 @@ public class PluginLoader {
 
         // Charger la classe principale du plugin
         URL[] urls = {file.toURI().toURL()};
-        URLClassLoader classLoader = new URLClassLoader(urls, this.getClass().getClassLoader());
+        URLClassLoader classLoader = new URLClassLoader(urls, PluginLoader.class.getClassLoader());
         Class<?> clazz = Class.forName(mainClass, true, classLoader);
 
         // Vérifier que la classe implémente Plugin
@@ -62,14 +58,15 @@ public class PluginLoader {
         return (Plugin) clazz.getDeclaredConstructor().newInstance();
     }
 
-    private void addEntitiesToHibernate(ClassLoader classLoader, Map<String, Object> data)  {
+    private static void addEntitiesToHibernate(ClassLoader classLoader, Map<String, Object> data)  {
 
         if (data.containsKey("entities")) {
             for (String entityClassName : (Iterable<String>) data.get("entities")) {
                 try {
                     Class<?> entityClass = Class.forName(entityClassName, true, classLoader);
                     BellaBot.getDatabaseManager().registerEntity(entityClass);  // Ajoute la classe à Hibernate
-                    Logger.info("Registered entity class: " + entityClassName);
+                    Logger.debug("Added entity class: " + entityClassName);
+                    System.out.println(Thread.currentThread().getContextClassLoader());
                 } catch (ClassNotFoundException ex){
                     Logger.error("Couldn't find and register entity " + entityClassName, ex);
                 } catch (Exception e){
@@ -83,10 +80,5 @@ public class PluginLoader {
         }
     }
 
-    public synchronized static PluginLoader getInstance() {
-        if(instance == null){
-            instance = new PluginLoader();
-        }
-        return instance;
-    }
+
 }

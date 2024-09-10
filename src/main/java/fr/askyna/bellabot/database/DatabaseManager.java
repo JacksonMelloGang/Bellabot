@@ -1,5 +1,6 @@
 package fr.askyna.bellabot.database;
 
+import fr.askyna.bellabot.BellaBot;
 import fr.askyna.bellabot.config.ConfigManager;
 import fr.askyna.bellabot.plugin.PluginLoader;
 import fr.askyna.bellabot.plugin.PluginManager;
@@ -24,43 +25,37 @@ public class DatabaseManager {
     private SessionFactory sessionFactory;
     private EntityManagerFactory entityManagerFactory;
     private Set<Class<?>> entityClasses;
-    private ClassLoader pluginClassLoader;
+    private Configuration config;
 
     private DatabaseManager() {
         this.entityClasses = new HashSet<>();
+        config = new Configuration();
     }
 
     public void connect() {
         try {
 
-            if (pluginClassLoader == null) {
-                pluginClassLoader = PluginLoader.getInstance().getClass().getClassLoader();
+            if(config == null){
+                Logger.error("Didn't initialize DatabaseManager");
+                return;
             }
-            Thread.currentThread().setContextClassLoader(pluginClassLoader);
 
-            Configuration config = new Configuration();
             config.setProperty("hibernate.connection.url", "jdbc:mysql://" + ConfigManager.getMySQLHost() + ":" + ConfigManager.getMySQLPort() + "/" + ConfigManager.getMySQLDatabase());
             config.setProperty("hibernate.connection.username", ConfigManager.getMySQLUsername());
             config.setProperty("hibernate.connection.password", ConfigManager.getMySQLPassword());
             config.setProperty("hibernate.show_sql", "true");
             //config.setProperty("hibernate.format_sql", "true");
-            config.setProperty("hibernate.use_sql_comments", "true");
+            //config.setProperty("hibernate.use_sql_comments", "true");
             config.setProperty("hibernate.hbm2ddl.auto", "update");
             config.setProperty("hibernate.archive.autodetection", "class,hbm");
 
             // Ajout des entités enregistrées
-            ClassLoader pluginClassLoader = PluginManager.getInstance().getClass().getClassLoader();
             for (Class<?> entityClass : entityClasses) {
-                try {
-                    Class<?> loadedClass = Class.forName(entityClass.getName(), true, pluginClassLoader);
-                    config.addAnnotatedClass(loadedClass);
-                } catch (ClassNotFoundException e) {
-                    Logger.error("Impossible de charger la classe d'entité : " + entityClass.getName(), e);
-                }
+                config.addAnnotatedClass(entityClass);
             }
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-//                    .addService(ClassLoaderService.class, new ClassLoaderServiceImpl(PluginLoader.getInstance().getClass().getClassLoader()))
+                    .addService(ClassLoaderService.class, new ClassLoaderServiceImpl(classLoader))
                     .applySettings(config.getProperties())
                     .build();
 
@@ -102,14 +97,6 @@ public class DatabaseManager {
         if (sessionFactory != null) {
             sessionFactory.close();
         }
-    }
-
-    public void setPluginClassLoader(ClassLoader pluginClassLoader) {
-        this.pluginClassLoader = pluginClassLoader;
-    }
-
-    public ClassLoader getPluginClassLoader() {
-        return pluginClassLoader;
     }
 
     public synchronized static DatabaseManager getInstance() {
