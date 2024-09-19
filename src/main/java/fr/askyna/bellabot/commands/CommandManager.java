@@ -19,8 +19,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 
 import java.awt.*;
 import java.security.MessageDigest;
@@ -145,15 +143,15 @@ public class CommandManager extends ListenerAdapter {
                 Logger.info("Registering command " + command.getName());
                 commandDataList.add(commandData);
 
-                // save in database
-                try(Session session = DatabaseManager.getInstance().getSessionFactory().openSession()){
-                    session.beginTransaction();
-                    session.save(commandEntity);
-                    session.getTransaction().commit();
-                    session.close();
-                } catch (ConstraintViolationException e){
-                    Logger.warn("An error occured while registering command : " + e.getMessage());
-                }
+//                // save in database
+//                try(Session session = DatabaseManager.getInstance().getSessionFactory().openSession()){
+//                    session.beginTransaction();
+//                    session.save(commandEntity);
+//                    session.getTransaction().commit();
+//                    session.close();
+//                } catch (ConstraintViolationException e){
+//                    Logger.warn("An error occured while registering command : " + e.getMessage());
+//                }
 
 
                 jda.upsertCommand(commandData).queue();

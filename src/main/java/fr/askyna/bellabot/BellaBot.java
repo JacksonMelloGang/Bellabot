@@ -32,6 +32,10 @@ public class BellaBot {
         ConfigManager.loadConfig();
         BellaConfig.loadConfig();
 
+        databaseManager.registerEntity(GuildEntity.class);
+        databaseManager.registerEntity(UserEntity.class);
+        databaseManager.registerEntity(CommandEntity.class);
+
         // Initialiser le gestionnaire de commandes avec le système de permissions par défaut
         Logger.info("Step 2/5 - Initializing commands");
         commandManager = new CommandManager(new DefaultPermissionHandler());
@@ -45,15 +49,11 @@ public class BellaBot {
         pluginManager.loadPlugins();
 
 
-        databaseManager.registerEntity(GuildEntity.class);
-        databaseManager.registerEntity(UserEntity.class);
-        databaseManager.registerEntity(CommandEntity.class);
-
         Logger.info("Step 4/5 - Connecting to the database");
         databaseManager.connect();
 
         Logger.info("Step 5/5 - Login to Discord..");
-        // Initialiser JDA
+        // Init JDA
         jda = JDABuilder.createDefault(config.getToken()).build();
 
         // Enregistrer le gestionnaire d'événements
@@ -67,7 +67,7 @@ public class BellaBot {
 //        cronScheduler.scheduleCronTask(myFirstTask, 0, 10, TimeUnit.SECONDS); // Toutes les 10 secondes
 //        cronScheduler.scheduleCronTask(mySecondTask, 0, 15, TimeUnit.SECONDS); // Toutes les 15 secondes
 
-        // Enregistrer les commandes avec JDA
+        // Save commands into JDA
         Logger.info("Registering all commands");
         commandManager.registerAllCommands(jda);
 

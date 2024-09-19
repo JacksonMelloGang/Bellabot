@@ -1,35 +1,25 @@
 package fr.askyna.bellabot.database.entity;
 
-import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.Set;
 
-@Entity
-@Table(name = "CommandEntity")
+
 public class CommandEntity {
 
-    @Id
-    @Column(nullable = false, unique = true)
     String command;
-
-    @Column(nullable = false)
     String description;
-
-    @Column(nullable = true)
     Set<Long> requiredRoles; //rolesID
-
-    @Column(nullable = true)
     Set<Integer> requiredPermissions; // permissionID
-
-    @Column(nullable = true)
     List<String> subCommands;
-
-    @Column(nullable = true)
     List<String> options;
 
     public CommandEntity(){
 
+    }
+
+    public CommandEntity(String command) {
+        this.command = command;
     }
 
     public CommandEntity(String command, String description) {

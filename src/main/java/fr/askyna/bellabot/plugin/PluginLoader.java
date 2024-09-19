@@ -53,28 +53,34 @@ public class PluginLoader {
             throw new IllegalArgumentException("La classe principale " + mainClass + " n'implémente pas l'interface Plugin.");
         }
 
-        addEntitiesToHibernate(classLoader, data);
+        addEntitiesToHibernate(file, data);
 
         return (Plugin) clazz.getDeclaredConstructor().newInstance();
     }
 
-    private static void addEntitiesToHibernate(ClassLoader classLoader, Map<String, Object> data)  {
+    private static void addEntitiesToHibernate(File file, Map<String, Object> data)  {
 
         if (data.containsKey("entities")) {
-            for (String entityClassName : (Iterable<String>) data.get("entities")) {
-                try {
-                    Class<?> entityClass = Class.forName(entityClassName, true, classLoader);
-                    BellaBot.getDatabaseManager().registerEntity(entityClass);  // Ajoute la classe à Hibernate
-                    Logger.debug("Added entity class: " + entityClassName);
-                    System.out.println(Thread.currentThread().getContextClassLoader());
-                } catch (ClassNotFoundException ex){
-                    Logger.error("Couldn't find and register entity " + entityClassName, ex);
-                } catch (Exception e){
-                    Logger.error("Unknown error occurred while registering entity", e);
-                }
-
-
+            Logger.info("Found entities to register. ");
+            try {
+                DatabaseManager.getInstance().loadEntitiesFromJar(file.getPath(), data);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
+//            for (String entityClassName : (Iterable<String>) data.get("entities")) {
+//                try {
+//                    Class<?> entityClass = Class.forName(entityClassName, true, classLoader);
+//                    BellaBot.getDatabaseManager().registerEntity(entityClass);  // Ajoute la classe à Hibernate
+//                    Logger.debug("Added entity class: " + entityClassName);
+//                    System.out.println(Thread.currentThread().getContextClassLoader());
+//                } catch (ClassNotFoundException ex){
+//                    Logger.error("Couldn't find and register entity " + entityClassName, ex);
+//                } catch (Exception e){
+//                    Logger.error("Unknown error occurred while registering entity", e);
+//                }
+//
+//
+//            }
         } else {
             Logger.info("No entities specified in plugin.yml for plugin" + data.get("name")  );
         }
